@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="StateCraft — безкоштовний симулятор держави, створений Андрієм Пузирьовим.">
+<title>StateCraft — Симулятор держави</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d30;--panel2:#18263c;--line:#2b3b55;--text:#eef4ff;--muted:#a9bad2;--accent:#55d6be;--gold:#ffd166;--red:#ff7b83;--blue:#72a7ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0%,#172844 0,#0b1220 42%);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,select,input{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#20314b;color:var(--text);padding:10px 13px;border-radius:10px;font-weight:650;transition:.15s}button:hover{filter:brightness(1.15);transform:translateY(-1px)}button.primary{background:var(--accent);color:#06211e;border-color:transparent}button.gold{background:#5c4820;border-color:#92732c}button.danger{background:#4b2633;border-color:#773c4c}
+.wrap{max-width:1250px;margin:auto;padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:18px}.brand{display:flex;align-items:center;gap:12px}.emblem{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#55d6be,#72a7ff);display:grid;place-items:center;color:#092031;font-size:24px;font-weight:900}.brand h1{font-size:23px;margin:0}.sub{color:var(--muted);font-size:13px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.toolbar select{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-bottom:16px}.panel{background:linear-gradient(180deg,rgba(24,38,60,.97),rgba(18,29,48,.97));border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 12px 30px #0002}.panel h2,.panel h3{margin:0 0 12px}.intro{display:flex;flex-direction:column;justify-content:space-between;min-height:230px}.intro h2{font-size:clamp(25px,4vw,39px);line-height:1.1;margin:10px 0}.intro p{color:var(--muted);max-width:650px}.tag{display:inline-block;background:#203b4b;color:var(--accent);padding:5px 9px;border-radius:99px;font-size:12px;font-weight:800;letter-spacing:.05em}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.map{min-height:230px;display:grid;place-items:center;overflow:hidden;position:relative;background:linear-gradient(160deg,#17364a,#102b37 55%,#182e42)}.map svg{width:100%;max-height:230px}.maplabel{position:absolute;left:15px;bottom:12px;color:#c8f6ec;font-size:12px;background:#0b1c28bb;padding:6px 9px;border-radius:7px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.stat{padding:15px}.stat .label{font-size:13px;color:var(--muted)}.stat .value{font-size:clamp(20px,3vw,29px);font-weight:800;margin-top:4px}.stat .change{font-size:12px;color:var(--accent);margin-top:3px}
+.grid{display:grid;grid-template-columns:1.05fr 1fr .95fr;gap:16px;align-items:start}.section{margin-bottom:16px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #2b3b5566}.row:last-child{border-bottom:0}.row small{display:block;color:var(--muted);font-size:12px}.row strong{display:block}.row button{white-space:nowrap;padding:8px 10px;font-size:13px}.bar{height:8px;background:#0b1422;border-radius:99px;overflow:hidden;margin-top:7px}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:99px}
+.policy{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #2b3b5566}.policy:last-child{border-bottom:0}.policy input{width:110px;accent-color:var(--accent)}.pill{font-size:12px;padding:4px 8px;border-radius:99px;background:#243852;color:var(--muted)}.log{max-height:245px;overflow:auto}.logitem{padding:9px 0;border-bottom:1px solid #2b3b5566;font-size:13px}.logitem:last-child{border:0}.logitem time{color:var(--accent);font-weight:800;margin-right:7px}.footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0 10px}.notice{padding:10px 12px;border-radius:10px;background:#203a35;border:1px solid #32675b;color:#c6fff0;font-size:13px;margin-bottom:14px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#eef4ff;color:#102034;padding:11px 16px;border-radius:12px;box-shadow:0 8px 25px #0005;display:none;z-index:5;font-weight:700}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){.wrap{padding:12px}.grid{grid-template-columns:1fr}.panel{padding:14px}.stats{gap:8px}.stat{padding:12px}.brand h1{font-size:19px}.intro{min-height:unset}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+ <div class="brand"><div class="emblem">S</div><div><h1>StateCraft <span style="color:var(--accent)">/</span> <span data-i="subtitle">Симулятор держави</span></h1><div class="sub">Created by Andrii Puzyrov · v1.0</div></div></div>
+ <div class="toolbar">
+  <select id="lang" aria-label="Language"><option value="uk">🇺🇦 Українська</option><option value="en">🇬🇧 English</option></select>
+  <button id="saveBtn" data-i="save">Зберегти</button>
+  <button id="resetBtn" class="danger" data-i="reset">Нова гра</button>
+ </div>
+</header>
+<div class="notice" data-i="notice">Це навчальна вигадана симуляція. Показники умовні й не відображають реальні країни.</div>
+<section class="hero">
+ <div class="panel intro">
+  <div><span class="tag" data-i="tag">КЕРУЙ. РОЗВИВАЙ. ВИРІШУЙ.</span><h2 data-i="welcome">Твоя країна. Твої рішення.</h2><p data-i="description">Керуй бюджетом, розвивай інфраструктуру, фінансуй освіту й охорону здоров’я. Кожен хід — один квартал, а твої рішення впливають на економіку та добробут людей.</p></div>
+  <div class="actions"><button class="primary" id="nextTurn" data-i="next">▶ Наступний квартал</button><button id="renameBtn" data-i="rename">Змінити назву країни</button><button id="exportBtn" data-i="export">Експорт збереження</button></div>
+ </div>
+ <div class="panel map">
+ <svg viewBox="0 0 500 260" role="img" aria-label="Decorative fictional country map">
+  <defs><linearGradient id="land" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#67d8b8"/><stop offset="1" stop-color="#319b9b"/></linearGradient></defs>
+  <path d="M80 67 L128 43 169 54 199 31 238 51 279 42 306 68 349 61 379 89 366 119 393 143 369 172 337 177 317 213 282 207 255 231 222 211 187 218 164 187 129 184 115 153 85 140 96 109 69 91Z" fill="url(#land)" stroke="#a7ffe7" stroke-width="2"/>
+  <path d="M130 76 L168 88 180 122 153 149 127 132Z M220 67 L257 78 273 109 246 133 215 113Z M294 85 L339 89 350 120 320 145 286 126Z M190 151 L222 142 249 166 231 193 198 187Z M275 151 L311 159 304 190 273 194 256 174Z" fill="#2d7c79" stroke="#b1f8e5" stroke-width="1.5"/>
+  <circle cx="237" cy="126" r="7" fill="#ffd166" stroke="#fff2bd" stroke-width="3"/><path d="M237 117 L237 92" stroke="#ffd166" stroke-width="2"/><text x="247" y="89" fill="#fff" font-size="12" font-weight="700">CAPITAL</text>
+  <circle cx="160" cy="169" r="4" fill="#d8fff4"/><circle cx="323" cy="151" r="4" fill="#d8fff4"/><circle cx="302" cy="82" r="4" fill="#d8fff4"/>
+  <path d="M36 215 Q115 192 155 220 T263 219 T462 212" fill="none" stroke="#4b8ea0" stroke-width="2" stroke-dasharray="5 6"/>
+ </svg><div class="maplabel" data-i="maplabel">Вигадана територія · декоративна карта</div>
+ </div>
+</section>
+<section class="stats">
+ <div class="panel stat"><div class="label" data-i="gdp">ВВП</div><div class="value" id="gdpValue">$82.4 млрд</div><div class="change" id="gdpChange">+0.0% за квартал</div></div>
+ <div class="panel stat"><div class="label" data-i="population">Населення</div><div class="value" id="popValue">8.4 млн</div><div class="change" id="popChange">стабільне</div></div>
+ <div class="panel stat"><div class="label" data-i="treasury">Державна скарбниця</div><div class="value" id="cashValue">$12.6 млрд</div><div class="change" id="cashChange">доступний резерв</div></div>
+ <div class="panel stat"><div class="label" data-i="approval">Підтримка громадян</div><div class="value" id="approvalValue">62%</div><div class="bar"><span id="approvalBar" style="width:62%"></span></div></div>
+</section>
+<div class="grid">
+ <div>
+  <section class="panel section">
+   <h3 data-i="ministries">🏛️ Розвиток країни</h3>
+   <div class="row"><div><strong data-i="roads">Дороги й інфраструктура</strong><small data-i="roadsDesc">Покращує продуктивність</small></div><button data-action="roads" data-cost="1.8" data-i="build">Розвивати · $1.8 млрд</button></div>
+   <div class="row"><div><strong data-i="education">Освіта</strong><small data-i="educationDesc">Підвищує людський капітал</small></div><button data-action="education" data-cost="1.4" data-i="build">Фінансувати · $1.4 млрд</button></div>
+   <div class="row"><div><strong data-i="health">Охорона здоров’я</strong><small data-i="healthDesc">Підтримує добробут</small></div><button data-action="health" data-cost="1.5" data-i="build">Фінансувати · $1.5 млрд</button></div>
+   <div class="row"><div><strong data-i="industry">Промисловість</strong><small data-i="industryDesc">Збільшує виробництво</small></div><button data-action="industry" data-cost="2.2" data-i="build">Інвестувати · $2.2 млрд</button></div>
+   <div class="row"><div><strong data-i="green">Зелена енергетика</strong><small data-i="greenDesc">Довгострокова модернізація</small></div><button data-action="green" data-cost="1.7" data-i="build">Інвестувати · $1.7 млрд</button></div>
+  </section>
+  <section class="panel section">
+   <h3 data-i="policy">📊 Державна політика</h3>
+   <div class="policy"><div><strong data-i="tax">Податкова ставка</strong><small data-i="taxDesc">Впливає на доходи та підтримку</small></div><input id="taxSlider" type="range" min="5" max="35" value="18"><span class="pill" id="taxLabel">18%</span></div>
+   <div class="policy"><div><strong data-i="welfare">Соціальні витрати</strong><small data-i="welfareDesc">Підтримка населення</small></div><input id="welfareSlider" type="range" min="0" max="10" value="5"><span class="pill" id="welfareLabel">5/10</span></div>
+   <div class="actions"><button id="applyPolicy" class="primary" data-i="apply">Застосувати політику</button></div>
+  </section>
+ </div>
+ <div>
+  <section class="panel section">
+   <h3 data-i="cabinet">🧭 Стан держави</h3>
+   <div class="row"><div><strong data-i="educationIndex">Освіта</strong><small data-i="indexDesc">Індекс розвитку, 0–100</small></div><strong id="eduValue">68/100</strong></div><div class="bar"><span id="eduBar" style="width:68%"></span></div>
+   <div class="row"><div><strong data-i="healthIndex">Здоров’я</strong><small data-i="indexDesc">Індекс розвитку, 0–100</small></div><strong id="healthValue">72/100</strong></div><div class="bar"><span id="healthBar" style="width:72%"></span></div>
+   <div class="row"><div><strong data-i="infraIndex">Інфраструктура</strong><small data-i="indexDesc">Індекс розвитку, 0–100</small></div><strong id="infraValue">55/100</strong></div><div class="bar"><span id="infraBar" style="width:55%"></span></div>
+   <div class="row"><div><strong data-i="envIndex">Екологія</strong><small data-i="indexDesc">Індекс розвитку, 0–100</small></div><strong id="envValue">61/100</strong></div><div class="bar"><span id="envBar" style="width:61%"></span></div>
+   <div class="row"><div><strong data-i="jobs">Безробіття</strong><small data-i="jobsDesc">Частка робочої сили</small></div><strong id="unemploymentValue">7.2%</strong></div>
+   <div class="row"><div><strong data-i="quarter">Поточний квартал</strong><small data-i="term">Термін уряду</small></div><strong id="quarterValue">2026 · Q1</strong></div>
+  </section>
+  <section class="panel section">
+   <h3 data-i="decisions">⚖️ Національні рішення</h3>
+   <div class="row"><div><strong data-i="research">Науковий грант</strong><small data-i="researchDesc">+$ до майбутнього зростання</small></div><button data-action="research" data-cost="0.9" data-i="approve">Схвалити · $0.9 млрд</button></div>
+   <div class="row"><div><strong data-i="festival">Національний фестиваль</strong><small data-i="festivalDesc">Підвищує підтримку</small></div><button data-action="festival" data-cost="0.4" data-i="approve">Схвалити · $0.4 млрд</button></div>
+   <div class="row"><div><strong data-i="audit">Антикорупційний аудит</strong><small data-i="auditDesc">Може поліпшити бюджетну ефективність</small></div><button data-action="audit" data-cost="0.6" data-i="approve">Схвалити · $0.6 млрд</button></div>
+  </section>
+ </div>
+ <div>
+  <section class="panel section">
+   <h3 data-i="economy">💹 Економічний звіт</h3>
+   <div class="row"><div><strong data-i="income">Доходи за квартал</strong><small data-i="taxIncome">Податки та надходження</small></div><strong id="incomeValue">$3.1 млрд</strong></div>
+   <div class="row"><div><strong data-i="spending">Витрати за квартал</strong><small data-i="publicSpending">Послуги й державні програми</small></div><strong id="spendingValue">$2.4 млрд</strong></div>
+   <div class="row"><div><strong data-i="balance">Баланс бюджету</strong><small data-i="balanceDesc">Доходи мінус витрати</small></div><strong id="balanceValue">+$0.7 млрд</strong></div>
+   <div class="row"><div><strong data-i="debt">Державний борг</strong><small data-i="debtDesc">Умовний борг</small></div><strong id="debtValue">$18.0 млрд</strong></div>
+  </section>
+  <section class="panel section">
+   <h3 data-i="events">📜 Журнал подій</h3>
+   <div id="log" class="log" aria-live="polite"></div>
+  </section>
+  <section class="panel">
+   <h3 data-i="howto">ℹ️ Як грати</h3>
+   <p style="color:var(--muted);font-size:13px;margin-bottom:0" data-i="rules">Обирай інвестиції, налаштовуй податки й соціальні витрати, а потім натискай «Наступний квартал». Усі числа умовні. Гра автоматично зберігається в цьому браузері, коли натискаєш «Зберегти».</p>
+  </section>
+ </div>
+</div>
+<footer class="footer">StateCraft · A free fictional country simulator · Created by Andrii Puzyrov · Not an official government or real-world economic tool.</footer>
+</div><div class="toast" id="toast"></div>
+<script>
+const translations={
+uk:{subtitle:"Симулятор держави",save:"Зберегти",reset:"Нова гра",notice:"Це навчальна вигадана симуляція. Показники умовні й не відображають реальні країни.",tag:"КЕРУЙ. РОЗВИВАЙ. ВИРІШУЙ.",welcome:"Твоя країна. Твої рішення.",description:"Керуй бюджетом, розвивай інфраструктуру, фінансуй освіту й охорону здоров’я. Кожен хід — один квартал, а твої рішення впливають на економіку та добробут людей.",next:"▶ Наступний квартал",rename:"Змінити назву країни",export:"Експорт збереження",maplabel:"Вигадана територія · декоративна карта",gdp:"ВВП",population:"Населення",treasury:"Державна скарбниця",approval:"Підтримка громадян",ministries:"🏛️ Розвиток країни",roads:"Дороги й інфраструктура",roadsDesc:"Покращує продуктивність",education:"Освіта",educationDesc:"Підвищує людський капітал",health:"Охорона здоров’я",healthDesc:"Підтримує добробут",industry:"Промисловість",industryDesc:"Збільшує виробництво",green:"Зелена енергетика",greenDesc:"Довгострокова модернізація",build:"Інвестувати",policy:"📊 Державна політика",tax:"Податкова ставка",taxDesc:"Впливає на доходи та підтримку",welfare:"Соціальні витрати",welfareDesc:"Підтримка населення",apply:"Застосувати політику",cabinet:"🧭 Стан держави",educationIndex:"Освіта",healthIndex:"Здоров’я",infraIndex:"Інфраструктура",envIndex:"Екологія",indexDesc:"Індекс розвитку, 0–100",jobs:"Безробіття",jobsDesc:"Частка робочої сили",quarter:"Поточний квартал",term:"Термін уряду",decisions:"⚖️ Національні рішення",research:"Науковий грант",researchDesc:"Підтримує майбутнє зростання",festival:"Національний фестиваль",festivalDesc:"Підвищує підтримку",audit:"Антикорупційний аудит",auditDesc:"Поліпшує бюджетну ефективність",approve:"Схвалити",economy:"💹 Економічний звіт",income:"Доходи за квартал",taxIncome:"Податки та надходження",spending:"Витрати за квартал",publicSpending:"Послуги й державні програми",balance:"Баланс бюджету",balanceDesc:"Доходи мінус витрати",debt:"Державний борг",debtDesc:"Умовний борг",events:"📜 Журнал подій",howto:"ℹ️ Як грати",rules:"Обирай інвестиції, налаштовуй податки й соціальні витрати, а потім натискай «Наступний квартал». Усі числа умовні. Гра автоматично зберігається в цьому браузері, коли натискаєш «Зберегти».",stable:"стабільне",reserve:"доступний резерв",quarterChange:"за квартал",saved:"Гру збережено в цьому браузері.",resetConfirm:"Почати нову гру? Поточне збереження буде замінено.",countryPrompt:"Введи назву своєї країни:",renamed:"Назву країни змінено на",notEnough:"Недостатньо коштів у скарбниці!",investment:"Інвестиція виконана:",policyApplied:"Політику застосовано. Її наслідки вплинуть на наступні квартали.",quarterLog:"Настав новий квартал.",exported:"Файл збереження підготовлено.",growth:"Зростання",recession:"Економіка сповільнилася.",citizen:"Громадяни задоволені покращеннями.",crisis:"Бюджетний дефіцит зростає — переглянь політику.",cost:"Вартість",gdpGrowth:"за квартал",gameOver:"Країна переживає серйозні труднощі. Зміни політику та віднови бюджет."},
+en:{subtitle:"Country Simulator",save:"Save",reset:"New game",notice:"This is an educational fictional simulation. Figures are illustrative and do not represent real countries.",tag:"LEAD. DEVELOP. DECIDE.",welcome:"Your country. Your decisions.",description:"Manage the budget, develop infrastructure, fund education and healthcare. Each turn is one quarter, and your decisions affect the economy and people's well-being.",next:"▶ Next quarter",rename:"Rename country",export:"Export save",maplabel:"Fictional territory · decorative map",gdp:"GDP",population:"Population",treasury:"National treasury",approval:"Citizen approval",ministries:"🏛️ Develop the country",roads:"Roads & infrastructure",roadsDesc:"Improves productivity",education:"Education",educationDesc:"Builds human capital",health:"Healthcare",healthDesc:"Supports well-being",industry:"Industry",industryDesc:"Increases production",green:"Green energy",greenDesc:"Long-term modernization",build:"Invest",policy:"📊 Public policy",tax:"Tax rate",taxDesc:"Affects revenue and approval",welfare:"Social spending",welfareDesc:"Supports residents",apply:"Apply policy",cabinet:"🧭 State of the nation",educationIndex:"Education",healthIndex:"Healthcare",infraIndex:"Infrastructure",envIndex:"Environment",indexDesc:"Development index, 0–100",jobs:"Unemployment",jobsDesc:"Share of the workforce",quarter:"Current quarter",term:"Government term",decisions:"⚖️ National decisions",research:"Research grant",researchDesc:"Supports future growth",festival:"National festival",festivalDesc:"Raises approval",audit:"Anti-corruption audit",auditDesc:"Improves budget efficiency",approve:"Approve",economy:"💹 Economic report",income:"Quarterly revenue",taxIncome:"Taxes and receipts",spending:"Quarterly spending",publicSpending:"Services and public programs",balance:"Budget balance",balanceDesc:"Revenue minus spending",debt:"National debt",debtDesc:"Illustrative debt",events:"📜 Event log",howto:"ℹ️ How to play",rules:"Choose investments, adjust taxes and social spending, then click “Next quarter”. All figures are illustrative. Click “Save” to keep your game in this browser.",stable:"stable",reserve:"available reserve",quarterChange:"this quarter",saved:"Game saved in this browser.",resetConfirm:"Start a new game? Your current save will be replaced.",countryPrompt:"Enter your country's name:",renamed:"Country renamed to",notEnough:"Not enough money in the treasury!",investment:"Investment completed:",policyApplied:"Policy applied. Its effects will influence upcoming quarters.",quarterLog:"A new quarter has begun.",exported:"Save file prepared.",growth:"Growth",recession:"The economy slowed down.",citizen:"Citizens are pleased with improvements.",crisis:"The budget deficit is growing — review your policy.",cost:"Cost",gdpGrowth:"this quarter",gameOver:"The country is facing serious difficulties. Adjust policy and restore the budget."}
+};
+const initial=()=>({country:"Новалія",year:2026,q:1,gdp:82.4,pop:8.4,cash:12.6,approval:62,edu:68,health:72,infra:55,env:61,unemployment:7.2,debt:18,tax:18,welfare:5,income:3.1,spending:2.4,balance:.7,prevGDP:82.4,log:[]});
+let s=initial(),lang="uk";
+const $=id=>document.getElementById(id), t=k=>translations[lang][k]||k;
+function fmt(n,d=1){return new Intl.NumberFormat(lang==="uk"?"uk-UA":"en-US",{minimumFractionDigits:d,maximumFractionDigits:d}).format(n)}
+function money(n){return (n<0?"−":"")+"$"+fmt(Math.abs(n))+" млрд"}
+function addLog(msg){s.log.unshift({date:`${s.year} · Q${s.q}`,msg});s.log=s.log.slice(0,18)}
+function toast(msg){const el=$("toast");el.textContent=msg;el.style.display="block";clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.style.display="none",2300)}
+function render(){
+ document.documentElement.lang=lang;
+ document.querySelectorAll("[data-i]").forEach(el=>{const key=el.dataset.i;if(translations[lang][key])el.textContent=t(key)});
+ $("gdpValue").textContent="$"+fmt(s.gdp)+" млрд";$("popValue").textContent=fmt(s.pop)+" млн";$("cashValue").textContent="$"+fmt(s.cash)+" млрд";
+ $("approvalValue").textContent=Math.round(s.approval)+"%";$("approvalBar").style.width=s.approval+"%";
+ const change=((s.gdp-s.prevGDP)/Math.max(.01,s.prevGDP))*100;
+ $("gdpChange").textContent=(change>=0?"+":"")+fmt(change,1)+"% "+t("gdpGrowth");
+ $("popChange").textContent=t("stable");$("cashChange").textContent=t("reserve");
+ [["edu","eduValue","eduBar"],["health","healthValue","healthBar"],["infra","infraValue","infraBar"],["env","envValue","envBar"]].forEach(([k,v,b])=>{$(v).textContent=Math.round(s[k])+"/100";$(b).style.width=s[k]+"%"});
+ $("unemploymentValue").textContent=fmt(s.unemployment)+"%";$("quarterValue").textContent=s.year+" · Q"+s.q;
+ $("incomeValue").textContent=money(s.income);$("spendingValue").textContent=money(s.spending);$("balanceValue").textContent=(s.balance>=0?"+":"−")+money(Math.abs(s.balance));$("debtValue").textContent=money(s.debt);
+ $("taxSlider").value=s.tax;$("taxLabel").textContent=s.tax+"%";$("welfareSlider").value=s.welfare;$("welfareLabel").textContent=s.welfare+"/10";
+ $("log").innerHTML=s.log.map(x=>`<div class="logitem"><time>${escapeHtml(x.date)}</time>${escapeHtml(x.msg)}</div>`).join("")||`<div class="logitem">${lang==="uk"?"Тут з’являтимуться події після першого ходу.":"Events will appear here after your first turn."}</div>`;
+ document.title=`${s.country} — StateCraft`;
+}
+function escapeHtml(str){return String(str).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function save(){localStorage.setItem("statecraftSave",JSON.stringify(s));toast(t("saved"))}
+function load(){try{const v=localStorage.getItem("statecraftSave");if(v)s={...initial(),...JSON.parse(v)}}catch(e){}}
+function invest(type,cost){
+ if(s.cash<cost){toast(t("notEnough"));return}
+ s.cash-=cost;
+ const effects={roads:["infra",5],education:["edu",5],health:["health",5],industry:["gdp",3],green:["env",5],research:["edu",2],festival:["approval",5],audit:["cash",.5]};
+ const [key,amount]=effects[type];s[key]=Math.min(key==="gdp"?9999:100,s[key]+amount);
+ if(type==="industry")s.unemployment=Math.max(2,s.unemployment-.5);
+ if(type==="audit")s.debt=Math.max(0,s.debt-.3);
+ const label=t(type==="roads"?"roads":type==="education"?"education":type==="health"?"health":type==="industry"?"industry":type==="green"?"green":type==="research"?"research":type==="festival"?"festival":"audit");
+ addLog(`${t("investment")} ${label} (${money(cost)}).`);render();saveQuiet();
+}
+function nextTurn(){
+ s.prevGDP=s.gdp;
+ const taxFactor=(s.tax-18)*.022;
+ const welfareFactor=(s.welfare-5)*.045;
+ const infrastructureFactor=(s.infra-50)*.0018;
+ const eduFactor=(s.edu-50)*.0013;
+ const industryFactor=(s.gdp>0?0.012:0);
+ const growth=.012+infrastructureFactor+eduFactor+industryFactor-taxFactor*.35;
+ s.gdp=Math.max(5,s.gdp*(1+growth));
+ s.income=Math.max(.3,3.1*(s.gdp/82.4)*(s.tax/18));
+ s.spending=Math.max(.3,2.4+welfareFactor*2+(s.edu-68)*.008+(s.health-72)*.008);
+ s.balance=s.income-s.spending;
+ s.cash+=s.balance;
+ if(s.balance<0)s.debt+=Math.abs(s.balance)*.7;else s.debt=Math.max(0,s.debt-s.balance*.18);
+ s.approval=Math.max(0,Math.min(100,s.approval+(s.welfare-5)*1.1+(s.tax<22?0.6:-1.2)+(s.balance<0?-1.8:.5)+(s.health-70)*.015));
+ s.pop=Math.max(1,s.pop*(1+0.001+(s.health-70)*.00008));
+ s.unemployment=Math.max(2,Math.min(30,s.unemployment+(s.gdp/s.prevGDP-1<0?0.4:-0.15)));
+ if(s.env<40)s.approval-=.4;
+ let msg=t("quarterLog")+" ";
+ if(s.balance<0)msg+=t("crisis");else msg+=t("growth")+": "+(growth>=0?"+":"")+fmt(growth*100,1)+"%.";
+ addLog(msg);
+ s.q++;if(s.q>4){s.q=1;s.year++}
+ render();saveQuiet();
+}
+function saveQuiet(){try{localStorage.setItem("statecraftSave",JSON.stringify(s))}catch(e){}}
+$("lang").addEventListener("change",e=>{lang=e.target.value;render()});
+$("saveBtn").addEventListener("click",save);
+$("resetBtn").addEventListener("click",()=>{if(confirm(t("resetConfirm"))){s=initial();addLog(lang==="uk"?"Створено нову державу.":"A new country was created.");render();saveQuiet()}});
+$("nextTurn").addEventListener("click",nextTurn);
+$("renameBtn").addEventListener("click",()=>{const name=prompt(t("countryPrompt"),s.country);if(name&&name.trim()){s.country=name.trim().slice(0,40);addLog(t("renamed")+": "+s.country+".");render();saveQuiet()}});
+$("exportBtn").addEventListener("click",()=>{const blob=new Blob([JSON.stringify(s,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="statecraft-save.json";a.click();URL.revokeObjectURL(a.href);toast(t("exported"))});
+$("taxSlider").addEventListener("input",e=>{$("taxLabel").textContent=e.target.value+"%"});
+$("welfareSlider").addEventListener("input",e=>{$("welfareLabel").textContent=e.target.value+"/10"});
+$("applyPolicy").addEventListener("click",()=>{s.tax=Number($("taxSlider").value);s.welfare=Number($("welfareSlider").value);addLog(t("policyApplied"));render();saveQuiet();toast(t("policyApplied"))});
+document.querySelectorAll("[data-action]").forEach(btn=>btn.addEventListener("click",()=>invest(btn.dataset.action,Number(btn.dataset.cost))));
+load();if(!s.log.length)addLog(lang==="uk"?"Уряд сформовано. Почни керувати державою!":"Government formed. Start leading the country!");render();
+</script>
+</body>
+</html>
